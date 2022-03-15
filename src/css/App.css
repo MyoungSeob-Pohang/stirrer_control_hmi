@@ -1,0 +1,76 @@
+* {
+    color: #555;
+}
+.App {
+    padding: 20px;
+}
+.Header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 10vh;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+.Header > .MainLogo {
+    width: 15%;
+    height: 100%;
+}
+
+.Header > .MainLogo > a > img {
+    height: 80%;
+}
+
+.Header > .Menu {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 70%;
+    height: 100%;
+    justify-content: center;
+}
+.Header > .Menu > ul {
+    display: flex;
+    align-items: center;
+    width: 50%;
+    flex-wrap: wrap;
+    height: 100%;
+    border: 1px solid #d7d7d7;
+    border-radius: 30px;
+}
+.Header > .Menu > ul > li {
+    width: 25%;
+    height: 100%;
+}
+
+.Header > .Menu > ul > li > a:hover {
+    background-color: #eee;
+}
+
+.Header > .Menu > ul > li > a {
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 50%;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+.Header > .Menu > ul > li > a > svg {
+    width: 45px;
+    height: 45px;
+    padding: 5px;
+    border: 1px solid #eee;
+    border-radius: 50px;
+}
+
+.Header > .Menu > ul > li > a > div {
+    font-size: 14px;
+}
+
+.Header > .ThemeSelection {
+    width: 15%;
+    text-align: right;
+}
