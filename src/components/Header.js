@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -7,13 +7,12 @@ import { IoPeopleSharp } from '@react-icons/all-files/io5/IoPeopleSharp';
 import { GoHome } from '@react-icons/all-files/go/GoHome';
 import { AiOutlineAreaChart } from '@react-icons/all-files/ai/AiOutlineAreaChart';
 import { AiFillPieChart } from '@react-icons/all-files/ai/AiFillPieChart';
+import { Link } from 'react-router-dom';
+import { ProjectDispatchContext, ProjectStateContext } from '../App';
 
 function Header() {
-    const [checked, setChecked] = useState(false);
-
-    const handleChange = (event) => {
-        setChecked(event.target.checked);
-    };
+    const checkedFunc = useContext(ProjectDispatchContext);
+    const projectState = useContext(ProjectStateContext);
 
     const MaterialUISwitch = styled(Switch)(({ theme }) => ({
         width: 60,
@@ -70,36 +69,36 @@ function Header() {
             <div className="Menu">
                 <ul>
                     <li>
-                        <a href="/">
+                        <Link to="/">
                             <GoHome />
                             <div>Home</div>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="/1">
+                        <Link to="/menu1">
                             <IoPeopleSharp />
                             <div>Menu1</div>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="/2">
+                        <Link to="/2">
                             <AiOutlineAreaChart />
                             <div>Menu2</div>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="/3">
+                        <Link to="/3">
                             <AiFillPieChart />
                             <div>Menu3</div>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </div>
             <div className="ThemeSelection">
                 <FormControlLabel
-                    checked={checked}
-                    onChange={handleChange}
-                    control={<MaterialUISwitch sx={{ m: 1 }} defaultChecked />}
+                    checked={projectState.checked}
+                    onChange={checkedFunc.handleCheckedChange}
+                    control={<MaterialUISwitch sx={{ m: 1 }} />}
                     label="Color Theme"
                 />
             </div>
