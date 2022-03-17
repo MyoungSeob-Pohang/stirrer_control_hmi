@@ -1,17 +1,16 @@
-import { Suspense } from 'react';
 import Headers from '../components/Header';
 import HeadTitle from '../components/HeadTitle';
-import Menu3D from '../components/Menu3D';
 import DataTable from '../components/DataTable';
+import Menu3D from '../components/Menu3D';
+import Rdrawer from '../components/Rdrawer';
 
 const Menu1 = () => {
     return (
         <div className="Menu1">
             <Headers />
             <HeadTitle headText={'Menu1 Title'} />
-            <Suspense fallback={null}>
-                <Menu3D />
-            </Suspense>
+            <Rdrawer />
+            <Menu3D />
             <DataTable />
         </div>
     );

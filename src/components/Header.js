@@ -81,7 +81,7 @@ function Header() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/2">
+                        <Link to="/menu2">
                             <AiOutlineAreaChart />
                             <div>Menu2</div>
                         </Link>

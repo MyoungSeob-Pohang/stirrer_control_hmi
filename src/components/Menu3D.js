@@ -1,64 +1,86 @@
 import * as THREE from 'three';
-import { useRef, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Image, ScrollControls, Scroll, useScroll, Html } from '@react-three/drei';
-import { useSnapshot } from 'valtio';
-import { Minimap } from './Minimap';
-import { state, damp } from './Util3dMap';
+import React, { Fragment, Suspense, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Reflector, Environment, Loader } from '@react-three/drei';
+import Bottles from './Bottles';
+import { geometry, material } from './store';
 
-function Item({ index, position, scale, c = new THREE.Color(), ...props }) {
-    const ref = useRef();
-    const scroll = useScroll();
-    const { clicked, urls } = useSnapshot(state);
-    const [hovered, hover] = useState(false);
-    const click = () => (state.clicked = index === clicked ? null : index);
-    const over = () => hover(true);
-    const out = () => hover(false);
-    useFrame((state, delta) => {
-        const y = scroll.curve(index / urls.length - 1.5 / urls.length, 4 / urls.length);
-        ref.current.material.scale[1] = ref.current.scale.y = damp(ref.current.scale.y, clicked === index ? 5 : 4 + y, 8, delta);
-        ref.current.material.scale[0] = ref.current.scale.x = damp(ref.current.scale.x, clicked === index ? 4.7 : scale[0], 6, delta);
-        if (clicked !== null && index < clicked) ref.current.position.x = damp(ref.current.position.x, position[0] - 2, 6, delta);
-        if (clicked !== null && index > clicked) ref.current.position.x = damp(ref.current.position.x, position[0] + 2, 6, delta);
-        if (clicked === null || clicked === index) ref.current.position.x = damp(ref.current.position.x, position[0], 6, delta);
-        ref.current.material.grayscale = damp(
-            ref.current.material.grayscale,
-            hovered || clicked === index ? 0 : Math.max(0, 1 - y),
-            6,
-            delta
-        );
-        ref.current.material.color.lerp(c.set(hovered || clicked === index ? 'white' : '#aaa'), hovered ? 0.3 : 0.1);
-    });
-    return <Image ref={ref} {...props} position={position} scale={scale} onClick={click} onPointerOver={over} onPointerOut={out} />;
+function Sphere(props) {
+    return <mesh receiveShadow castShadow {...props} renderOrder={-2000000} geometry={geometry.sphere} material={material.sphere} />;
 }
 
-function Items({ w = 2, gap = 0.15 }) {
-    const { urls } = useSnapshot(state);
-    const { width } = useThree((state) => state.viewport);
-    const xW = w + gap;
+function Spheres() {
+    const group = useRef();
+    useFrame(() => {
+        group.current.children[0].position.x = THREE.MathUtils.lerp(group.current.children[0].position.x, -18, 0.02);
+        group.current.children[1].position.x = THREE.MathUtils.lerp(group.current.children[1].position.x, -10, 0.01);
+        group.current.children[2].position.x = THREE.MathUtils.lerp(group.current.children[2].position.x, 19, 0.03);
+        group.current.children[3].position.x = THREE.MathUtils.lerp(group.current.children[3].position.x, 10, 0.04);
+    });
     return (
-        <ScrollControls horizontal damping={10} pages={(width - xW + urls.length * xW) / width}>
-            <Minimap />
-            <Scroll>
-                {
-                    urls.map((url, i) => <Item key={i} index={i} position={[i * xW, 0, 0]} scale={[w, 4, 1]} url={url} />) /* prettier-ignore */
-                }
-            </Scroll>
-        </ScrollControls>
+        <group ref={group}>
+            <Sphere position={[-40, 1, 10]} />
+            <Sphere position={[-20, 10, -20]} scale={[10, 10, 10]} />
+            <Sphere position={[40, 3, 5]} scale={[3, 3, 3]} />
+            <Sphere position={[30, 0.75, 10]} scale={[0.75, 0.75, 0.75]} />
+        </group>
     );
 }
 
-const Menu3D = () => (
-    <div className="Menu3D">
-        <Canvas gl={{ antialias: false }} dpr={[1, 1.5]} onPointerMissed={() => (state.clicked = null)}>
-            <Items />
-            <Html scale={100} rotation={[Math.PI / 2, 0, 0]} position={[180, -350, 50]} transform occlude>
-                <div className="annotation">
-                    6.550 $ <span style={{ fontSize: '1.5em' }}>🥲</span>
-                </div>
-            </Html>
-        </Canvas>
-    </div>
-);
+function Zoom() {
+    const vec = new THREE.Vector3(0, 0, 100);
+    return useFrame((state) => {
+        state.camera.position.lerp(vec, 0.075);
+        state.camera.fov = THREE.MathUtils.lerp(state.camera.fov, 20, 0.075);
+        state.camera.lookAt(0, 0, 0);
+        state.camera.updateProjectionMatrix();
+    });
+}
 
-export default Menu3D;
+export default function Menu3D() {
+    return (
+        <div className="Menu3D">
+            <Fragment>
+                <Canvas dpr={[1, 1.5]} shadows camera={{ position: [0, 0, 100], fov: 30 }}>
+                    <fog attach="fog" args={['#a0a0a0', 100, 150]} />
+                    <color attach="background" args={['#a0a0a0']} />
+                    <spotLight penumbra={1} angle={0.35} castShadow position={[40, 80, 0]} intensity={1} shadow-mapSize={[256, 256]} />
+                    <Suspense fallback={null}>
+                        <group position={[0, -12, 0]}>
+                            <Bottles />
+                            <Spheres />
+                            <mesh
+                                rotation-x={-Math.PI / 2}
+                                position={[0, 0.01, 0]}
+                                scale={[200, 200, 200]}
+                                receiveShadow
+                                renderOrder={100000}
+                            >
+                                <planeBufferGeometry attach="geometry" />
+                                <shadowMaterial attach="material" transparent color="#251005" opacity={0.2} />
+                            </mesh>
+                            <Reflector
+                                resolution={1024}
+                                blur={[800, 50]}
+                                mirror={0.4}
+                                mixBlur={1}
+                                mixStrength={0.5}
+                                depthScale={1}
+                                minDepthThreshold={0.7}
+                                maxDepthThreshold={1}
+                                rotation-x={-Math.PI / 2}
+                                args={[100, 100]}
+                                color="#d0d0d0"
+                                metalness={1}
+                                roughness={0.75}
+                            />
+                        </group>
+                        <Environment preset="apartment" />
+                        <Zoom />
+                    </Suspense>
+                </Canvas>
+                <Loader />
+            </Fragment>
+        </div>
+    );
+}

@@ -4,6 +4,7 @@ import './css/Reset.css';
 import './css/App.css';
 import Main from './pages/Main';
 import Menu1 from './pages/Menu1';
+import Menu2 from './pages/Menu2';
 
 export const ProjectStateContext = React.createContext();
 export const ProjectDispatchContext = React.createContext();
@@ -23,6 +24,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Main />} />
                             <Route path="/menu1" element={<Menu1 />} />
+                            <Route path="/menu2" element={<Menu2 />} />
                         </Routes>
                     </div>
                 </BrowserRouter>
