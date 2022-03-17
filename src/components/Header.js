@@ -87,7 +87,7 @@ function Header() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/3">
+                        <Link to="/menu3">
                             <AiFillPieChart />
                             <div>Menu3</div>
                         </Link>

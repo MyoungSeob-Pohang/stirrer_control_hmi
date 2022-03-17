@@ -124,3 +124,16 @@
 .Rdrawer > button path {
     color: #0080cc;
 }
+
+.DatePicker {
+    margin: 20px 0;
+}
+
+.DatePicker > .PcikerArea {
+    display: flex;
+    align-items: center;
+}
+
+.DatePicker > .PcikerArea > span {
+    margin-right: 20px;
+}
